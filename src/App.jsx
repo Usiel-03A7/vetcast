@@ -2,7 +2,7 @@
 export default function App() {
   return (
     <>
-      <p>Start</p>
+      <p className="text-red-700">Tailwind done</p>
     </>
   )
 }
