@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FiSave, FiTrash2, FiX, FiEdit, FiCalendar } from 'react-icons/fi';
 
 const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePet }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,6 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
     visitCount: 1
   });
 
-  // Cargar datos al editar
   useEffect(() => {
     if (editingPet) {
       setFormData({
@@ -54,13 +54,19 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-blue-100">
-      <h2 className="text-xl font-semibold text-blue-700 mb-4">
-        {editingPet ? '✏️ Editar Registro' : '➕ Nuevo Registro'}
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-blue-100 max-w-2xl mx-auto">
+      <h2 className="text-lg sm:text-xl font-semibold text-blue-700 mb-4 text-center">
+        {editingPet ? (
+          <FiEdit className="inline-block text-blue-600 text-2xl mr-2" />
+        ) : (
+          <FiSave className="inline-block text-blue-600 text-2xl mr-2" />
+        )}
+        {editingPet ? 'Editar Registro' : 'Nuevo Registro'}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Columna Izquierda */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-blue-600 mb-1">
@@ -72,7 +78,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
                 value={formData.ownerName}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -86,10 +92,27 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
                 value={formData.petName}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-blue-600 mb-1">
+                Teléfono *
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Columna Derecha */}
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-blue-600 mb-1">
                 Edad (años) *
@@ -102,23 +125,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
                 min="0"
                 max="30"
                 required
-                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-blue-600 mb-1">
-                Teléfono *
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -134,7 +141,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
                 step="0.01"
                 min="0"
                 required
-                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -148,12 +155,13 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
                 value={formData.admissionDate}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
         </div>
 
+        {/* Fecha de Cita - Full width */}
         <div>
           <label className="block text-sm font-medium text-blue-600 mb-1">
             Fecha de Cita *
@@ -165,53 +173,55 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
             onChange={handleChange}
             min={new Date().toISOString().split('T')[0]}
             required
-            className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        <div className="flex justify-between pt-4">
-          <div>
-            {editingPet && (
+        {/* Botones - Centrados y compactos */}
+        <div className="flex justify-center space-x-3 pt-4">
+          {editingPet && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+              title="Cancelar"
+            >
+              <FiX size={24} />
+            </button>
+          )}
+          
+          <button
+            type="submit"
+            className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            title={editingPet ? "Actualizar" : "Guardar"}
+          >
+            {editingPet ? <FiEdit size={24} /> : <FiSave size={24} />}
+          </button>
+
+          {editingPet && (
+            <>
               <button
                 type="button"
                 onClick={() => onDeletePet(editingPet.id)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                title="Eliminar"
               >
-                Eliminar Registro
+                <FiTrash2 size={24} />
               </button>
-            )}
-          </div>
-          
-          <div className="flex space-x-3">
-            {editingPet && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-              >
-                Cancelar
-              </button>
-            )}
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              {editingPet ? 'Actualizar' : 'Guardar'}
-            </button>
-          </div>
+              
+              {editingPet?.appointmentDate && (
+                <button
+                  type="button"
+                  onClick={() => onDeleteAppointment(editingPet.id)}
+                  className="p-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                  title="Cancelar Cita"
+                >
+                  <FiCalendar size={24} />
+                </button>
+              )}
+            </>
+          )}
         </div>
-
-        {editingPet?.appointmentDate && (
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => onDeleteAppointment(editingPet.id)}
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
-            >
-              Cancelar Cita (solo quitar fecha)
-            </button>
-          </div>
-        )}
       </form>
     </div>
   );

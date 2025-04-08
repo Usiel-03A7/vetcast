@@ -7,8 +7,8 @@ import CalendarView from './components/CalendarView';
 function App() {
   const [pets, setPets] = useState([]);
   const [editingPet, setEditingPet] = useState(null);
+  const [showForm, setShowForm] = useState(false); // Solo para móvil
 
-  // Cargar mascotas
   useEffect(() => {
     const fetchPets = async () => {
       try {
@@ -25,7 +25,6 @@ function App() {
     fetchPets();
   }, []);
 
-  // Crear o actualizar mascota
   const handleSavePet = async (petData) => {
     try {
       if (editingPet) {
@@ -36,12 +35,12 @@ function App() {
         setPets([...pets, { ...petData, id: docRef.id }]);
       }
       setEditingPet(null);
+      setShowForm(false); // Cerrar formulario en móvil después de guardar
     } catch (error) {
       console.error("Error saving pet:", error);
     }
   };
 
-  // Eliminar cita (solo quita la fecha)
   const handleDeleteAppointment = async (petId) => {
     try {
       await updateDoc(doc(db, 'pets', petId), {
@@ -59,7 +58,6 @@ function App() {
     }
   };
 
-  // Eliminar mascota completamente
   const handleDeletePet = async (petId) => {
     if (window.confirm('¿Eliminar este registro permanentemente?')) {
       try {
@@ -67,6 +65,7 @@ function App() {
         setPets(pets.filter(pet => pet.id !== petId));
         if (editingPet?.id === petId) {
           setEditingPet(null);
+          setShowForm(false);
         }
       } catch (error) {
         console.error("Error deleting pet:", error);
@@ -75,28 +74,46 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 p-6">
+    <div className="min-h-screen bg-blue-50 p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-blue-800 mb-2">VetCast Calendar</h1>
-          <p className="text-blue-600">Gestión Completa de Citas Veterinarias</p>
+        <header className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-800 mb-2">VetCast Calendar</h1>
+          <p className="text-sm sm:text-base text-blue-600">Gestión Completa de Citas Veterinarias</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
+        {/* Botón para mostrar formulario en móvil */}
+        <div className="lg:hidden mb-4">
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            {showForm ? 'Ocultar Formulario' : 'Mostrar Formulario'}
+          </button>
+        </div>
+
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+          {/* Formulario - Oculto en móvil a menos que showForm sea true */}
+          <div className={`${showForm ? 'block' : 'hidden'} lg:block lg:col-span-1`}>
             <PetForm
               editingPet={editingPet}
               onSave={handleSavePet}
-              onCancel={() => setEditingPet(null)}
+              onCancel={() => {
+                setEditingPet(null);
+                setShowForm(false);
+              }}
               onDeleteAppointment={handleDeleteAppointment}
               onDeletePet={handleDeletePet}
             />
           </div>
 
+          {/* Calendario - Siempre visible */}
           <div className="lg:col-span-2">
             <CalendarView 
               pets={pets} 
-              onEdit={setEditingPet}
+              onEdit={(pet) => {
+                setEditingPet(pet);
+                setShowForm(true); // Mostrar formulario al editar en móvil
+              }}
               onDeleteAppointment={handleDeleteAppointment}
             />
           </div>
