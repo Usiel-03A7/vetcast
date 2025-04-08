@@ -1,13 +1,26 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './config/firebase';
+import Navbar from './components/Navbar';
 import PetForm from './components/PetForm';
 import CalendarView from './components/CalendarView';
+import PetList from './components/PetList';
+import EditPage from './components/EditPage';
+import ViewPage from './components/ViewPage';
+import { FiCalendar, FiList, FiPlus, FiSettings, FiEye } from 'react-icons/fi';
 
 function App() {
   const [pets, setPets] = useState([]);
   const [editingPet, setEditingPet] = useState(null);
-  const [showForm, setShowForm] = useState(false); // Solo para móvil
+  const [showForm, setShowForm] = useState(false);
+  const [activeView, setActiveView] = useState('agenda'); // 'agenda', 'lista', 'edit-page', 'view-page'
+  const [pageSettings, setPageSettings] = useState({
+    title: 'VetCast Veterinaria',
+    colors: {
+      primary: '#3b82f6',
+      secondary: '#1d4ed8'
+    }
+  });
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -35,7 +48,7 @@ function App() {
         setPets([...pets, { ...petData, id: docRef.id }]);
       }
       setEditingPet(null);
-      setShowForm(false); // Cerrar formulario en móvil después de guardar
+      setShowForm(false);
     } catch (error) {
       console.error("Error saving pet:", error);
     }
@@ -47,12 +60,9 @@ function App() {
         appointmentDate: null,
         lastUpdated: new Date().toISOString()
       });
-      setPets(pets.map(pet => 
-        pet.id === petId ? {...pet, appointmentDate: null} : pet
+      setPets(pets.map(pet =>
+        pet.id === petId ? { ...pet, appointmentDate: null } : pet
       ));
-      if (editingPet?.id === petId) {
-        setEditingPet({...editingPet, appointmentDate: null});
-      }
     } catch (error) {
       console.error("Error deleting appointment:", error);
     }
@@ -73,51 +83,105 @@ function App() {
     }
   };
 
+  const handleSavePageSettings = (newSettings) => {
+    setPageSettings(newSettings);
+    // Aquí podrías guardar en Firebase si lo necesitas
+    console.log('Configuración de página guardada:', newSettings);
+  };
+
   return (
-    <div className="min-h-screen bg-blue-50 p-4 sm:p-6">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-6 sm:mb-8 text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-800 mb-2">VetCast Calendar</h1>
-          <p className="text-sm sm:text-base text-blue-600">Gestión Completa de Citas Veterinarias</p>
-        </header>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        pageTitle={pageSettings.title}
+      />
 
-        {/* Botón para mostrar formulario en móvil */}
-        <div className="lg:hidden mb-4">
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            {showForm ? 'Ocultar Formulario' : 'Mostrar Formulario'}
-          </button>
-        </div>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        {activeView === 'edit-page' ? (
+          <EditPage
+            settings={pageSettings}
+            onSave={handleSavePageSettings}
+          />
+        ) : activeView === 'view-page' ? (
+          <ViewPage
+            pets={pets}
+            settings={pageSettings}
+          />
+        ) : (
+          <>
+            {/* Controles móviles */}
+            <div className="lg:hidden mb-4 flex flex-wrap gap-2">
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                {showForm ? (
+                  <>
+                    <FiX /> Ocultar Formulario
+                  </>
+                ) : (
+                  <>
+                    <FiPlus /> Nueva Mascota
+                  </>
+                )}
+              </button>
+              <div className="flex-1 flex gap-2">
+                <button
+                  onClick={() => setActiveView('agenda')}
+                  className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-md ${activeView === 'agenda' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                >
+                  <FiCalendar size={16} />
+                </button>
+                <button
+                  onClick={() => setActiveView('lista')}
+                  className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-md ${activeView === 'lista' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                >
+                  <FiList size={16} />
+                </button>
+              </div>
+            </div>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-          {/* Formulario - Oculto en móvil a menos que showForm sea true */}
-          <div className={`${showForm ? 'block' : 'hidden'} lg:block lg:col-span-1`}>
-            <PetForm
-              editingPet={editingPet}
-              onSave={handleSavePet}
-              onCancel={() => {
-                setEditingPet(null);
-                setShowForm(false);
-              }}
-              onDeleteAppointment={handleDeleteAppointment}
-              onDeletePet={handleDeletePet}
-            />
-          </div>
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Formulario */}
+              <div className={`${showForm ? 'block' : 'hidden'} lg:block lg:w-1/3`}>
+                <PetForm
+                  editingPet={editingPet}
+                  onSave={handleSavePet}
+                  onCancel={() => {
+                    setEditingPet(null);
+                    setShowForm(false);
+                  }}
+                  onDeleteAppointment={handleDeleteAppointment}
+                  onDeletePet={handleDeletePet}
+                />
+              </div>
 
-          {/* Calendario - Siempre visible */}
-          <div className="lg:col-span-2">
-            <CalendarView 
-              pets={pets} 
-              onEdit={(pet) => {
-                setEditingPet(pet);
-                setShowForm(true); // Mostrar formulario al editar en móvil
-              }}
-              onDeleteAppointment={handleDeleteAppointment}
-            />
-          </div>
-        </div>
+              {/* Contenido principal */}
+              <div className="lg:w-2/3">
+                {activeView === 'agenda' ? (
+                  <CalendarView
+                    pets={pets}
+                    onEdit={(pet) => {
+                      setEditingPet(pet);
+                      setShowForm(true);
+                    }}
+                    onDeleteAppointment={handleDeleteAppointment}
+                  />
+                ) : (
+                  <PetList
+                    pets={pets}
+                    setPets={setPets}
+                    setEditingPet={(pet) => {
+                      setEditingPet(pet);
+                      setShowForm(true);
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

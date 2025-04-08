@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiSave, FiTrash2, FiX, FiEdit, FiCalendar } from 'react-icons/fi';
-
+//Falta agregar un total que reste y sepa si es deudor o no 
 const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePet }) => {
   const [formData, setFormData] = useState({
     ownerName: '',
@@ -8,6 +8,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
     age: '',
     phone: '',
     price: '',
+    numberRed: '',
     admissionDate: '',
     appointmentDate: '',
     visitCount: 1
@@ -21,6 +22,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
         age: editingPet.age || '',
         phone: editingPet.phone || '',
         price: editingPet.price || '',
+        numberRed: editingPet.numberRed || '',
         admissionDate: editingPet.admissionDate || '',
         appointmentDate: editingPet.appointmentDate || '',
         visitCount: editingPet.visitCount || 1
@@ -48,6 +50,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
       ...formData,
       age: parseInt(formData.age) || 0,
       price: parseFloat(formData.price) || 0,
+      numberRed: parseFloat(formData.numberRed),
       lastUpdated: new Date().toISOString()
     };
     onSave(petData);
@@ -70,6 +73,19 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-blue-600 mb-1">
+                Nombre de la Mascota *
+              </label>
+              <input
+                type="text"
+                name="petName"
+                value={formData.petName}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-blue-600 mb-1">
                 Nombre del Dueño *
               </label>
               <input
@@ -82,19 +98,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-blue-600 mb-1">
-                Nombre de la Mascota *
-              </label>
-              <input
-                type="text"
-                name="petName"
-                value={formData.petName}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+
 
             <div>
               <label className="block text-sm font-medium text-blue-600 mb-1">
@@ -137,6 +141,21 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
                 type="number"
                 name="price"
                 value={formData.price}
+                onChange={handleChange}
+                step="0.01"
+                min="0"
+                required
+                className="w-full px-3 py-2 text-base border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-blue-600 mb-1">
+                Ingreso dado ($) *
+              </label>
+              <input
+                type="number"
+                name="numberRed"
+                value={formData.numberRed}
                 onChange={handleChange}
                 step="0.01"
                 min="0"
@@ -189,7 +208,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
               <FiX size={24} />
             </button>
           )}
-          
+
           <button
             type="submit"
             className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -208,7 +227,7 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
               >
                 <FiTrash2 size={24} />
               </button>
-              
+
               {editingPet?.appointmentDate && (
                 <button
                   type="button"
