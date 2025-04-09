@@ -1,101 +1,126 @@
+import { FiCalendar, FiList, FiEdit, FiEye, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 import { useState } from 'react';
-import { FiCalendar, FiList, FiSettings, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
 const Navbar = ({ activeView, onViewChange, pageTitle }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleNavigation = (view) => {
+    onViewChange(view);
+    setIsMenuOpen(false);
+  };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      // Forzar recarga para redirigir al login
+      window.location.reload();
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }
   };
 
-  const navItems = [
-    { id: 'agenda', icon: <FiCalendar />, label: 'Agenda' },
-    { id: 'lista', icon: <FiList />, label: 'Lista' },
-    { id: 'config', icon: <FiSettings />, label: 'Configuración' },
-  ];
+  const NavButton = ({ view, icon, text }) => (
+    <button
+      onClick={() => handleNavigation(view)}
+      className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${activeView === view
+          ? 'bg-blue-700 text-white'
+          : 'text-white hover:bg-blue-700 hover:bg-opacity-50'
+        }`}
+    >
+      {icon}
+      <span className="whitespace-nowrap">{text}</span>
+    </button>
+  );
 
   return (
-    <nav className="bg-blue-800 text-white shadow-lg">
+    <nav className="bg-blue-600 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo y título */}
           <div className="flex items-center">
-            <h1 className="text-xl font-semibold">{pageTitle}</h1>
+            <button
+              onClick={() => handleNavigation('agenda')}
+              className="text-xl font-bold hover:text-blue-200 transition-colors"
+            >
+              {pageTitle}
+            </button>
           </div>
-          
-          {/* Menú desktop (hidden en mobile) */}
-          <div className="hidden md:flex items-center space-x-4">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => onViewChange(item.id)}
-                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1 ${
-                  activeView === item.id ? 'bg-blue-900' : 'hover:bg-blue-700'
-                }`}
-              >
-                {item.icon}
-                {item.label}
-              </button>
-            ))}
-            
+
+          {/* Menú desktop */}
+          <div className="hidden md:flex items-center space-x-1">
+            <NavButton
+              view="agenda"
+              icon={<FiCalendar size={18} />}
+              text="Agenda"
+            />
+            <NavButton
+              view="lista"
+              icon={<FiList size={18} />}
+              text="Lista"
+            />
+            <NavButton
+              view="edit-page"
+              icon={<FiEdit size={18} />}
+              text="Editar Página"
+            />
+            <NavButton
+              view="view-page"
+              icon={<FiEye size={18} />}
+              text="Saldos Pendientes"
+            />
             <button
               onClick={handleLogout}
-              className="px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 flex items-center gap-1"
-              title="Cerrar sesión"
+              className="px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 text-white hover:bg-red-600 transition-colors"
             >
-              <FiLogOut />
+              <FiLogOut size={18} />
               <span className="hidden lg:inline">Salir</span>
             </button>
           </div>
-          
-          {/* Botón hamburguesa (solo mobile) */}
+
+          {/* Botón hamburguesa para móvil */}
           <div className="md:hidden flex items-center">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-blue-700 focus:outline-none"
-              aria-expanded="false"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-blue-700 hover:bg-opacity-50 focus:outline-none transition-colors"
             >
-              <span className="sr-only">Abrir menú principal</span>
-              {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+              {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
           </div>
         </div>
       </div>
-      
-      {/* Menú mobile (se muestra al hacer clic) */}
-      <div className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-blue-800">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                onViewChange(item.id);
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center gap-2 ${
-                activeView === item.id ? 'bg-blue-900 text-white' : 'text-white hover:bg-blue-700'
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </button>
-          ))}
-          
+
+      {/* Menú móvil */}
+      <div className={`md:hidden bg-blue-700 transition-all duration-300 ease-in-out overflow-hidden ${isMenuOpen ? 'max-h-96' : 'max-h-0'
+        }`}>
+        <div className="px-2 pt-2 pb-3 space-y-1">
+          <NavButton
+            view="agenda"
+            icon={<FiCalendar size={18} />}
+            text="Agenda"
+          />
+          <NavButton
+            view="lista"
+            icon={<FiList size={18} />}
+            text="Lista"
+          />
+          <NavButton
+            view="edit-page"
+            icon={<FiEdit size={18} />}
+            text="Editar Página"
+          />
+          <NavButton
+            view="view-page"
+            icon={<FiEye size={18} />}
+            text="Saldos Pendientes"
+          />
           <button
-            onClick={() => {
-              handleLogout();
-              setMobileMenuOpen(false);
-            }}
-            className="w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center gap-2 text-white hover:bg-red-700"
+            onClick={handleLogout}
+            className="w-full px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 text-white hover:bg-red-600 transition-colors"
           >
-            <FiLogOut />
-            Cerrar sesión
+            <FiLogOut size={18} />
+            <span>Cerrar sesión</span>
           </button>
         </div>
       </div>

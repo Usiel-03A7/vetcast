@@ -127,8 +127,12 @@ function App() {
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
         {activeView === 'edit-page' ? (
           <EditPage
-            settings={pageSettings}
-            onSave={handleSavePageSettings}
+            pets={pets}
+            onEditPet={(pet) => {
+              setEditingPet(pet);
+              setShowForm(true);
+              setActiveView('agenda');
+            }}
           />
         ) : activeView === 'view-page' ? (
           <ViewPage
