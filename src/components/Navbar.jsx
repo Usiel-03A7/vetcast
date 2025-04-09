@@ -63,7 +63,7 @@ const Navbar = ({ activeView, onViewChange, pageTitle }) => {
             <NavButton
               view="view-page"
               icon={<FiEye size={18} />}
-              text="Saldos pendientes"
+              text="Saldos Pendientes"
             />
             <button
               onClick={handleLogout}
@@ -108,7 +108,7 @@ const Navbar = ({ activeView, onViewChange, pageTitle }) => {
             <NavButton
               view="view-page"
               icon={<FiEye size={18} />}
-              text="Ver Página"
+              text="Saldos Pendientes"
             />
             <button
               onClick={handleLogout}
