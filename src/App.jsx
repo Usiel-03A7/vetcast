@@ -1,19 +1,24 @@
 import { useEffect, useState } from 'react';
+import { auth } from './config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './config/firebase';
+import Login from './components/Login';
 import Navbar from './components/Navbar';
 import PetForm from './components/PetForm';
 import CalendarView from './components/CalendarView';
 import PetList from './components/PetList';
 import EditPage from './components/EditPage';
 import ViewPage from './components/ViewPage';
-import { FiCalendar, FiList, FiPlus, FiX } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [pets, setPets] = useState([]);
   const [editingPet, setEditingPet] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [activeView, setActiveView] = useState('agenda'); // 'agenda', 'lista', 'edit-page', 'view-page'
+  const [activeView, setActiveView] = useState('agenda');
   const [pageSettings, setPageSettings] = useState({
     title: 'VetCast Veterinaria',
     colors: {
@@ -22,21 +27,33 @@ function App() {
     }
   });
 
+  // Verificar estado de autenticación
   useEffect(() => {
-    const fetchPets = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'pets'));
-        const petsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setPets(petsData);
-      } catch (error) {
-        console.error("Error loading pets:", error);
-      }
-    };
-    fetchPets();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+    return unsubscribe;
   }, []);
+
+  // Cargar mascotas solo si hay usuario autenticado
+  useEffect(() => {
+    if (user) {
+      const fetchPets = async () => {
+        try {
+          const querySnapshot = await getDocs(collection(db, 'pets'));
+          const petsData = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setPets(petsData);
+        } catch (error) {
+          console.error("Error loading pets:", error);
+        }
+      };
+      fetchPets();
+    }
+  }, [user]);
 
   const handleSavePet = async (petData) => {
     try {
@@ -54,6 +71,7 @@ function App() {
     }
   };
 
+  // ... (resto de tus funciones handleDeleteAppointment, handleDeletePet, etc.)
   const handleDeleteAppointment = async (petId) => {
     try {
       await updateDoc(doc(db, 'pets', petId), {
@@ -83,11 +101,20 @@ function App() {
     }
   };
 
-  const handleSavePageSettings = (newSettings) => {
-    setPageSettings(newSettings);
-    // Aquí podrías guardar en Firebase si lo necesitas
-    console.log('Configuración de página guardada:', newSettings);
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+          <p className="text-gray-700">Cargando aplicación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Login onLogin={() => setUser(auth.currentUser)} />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -116,11 +143,7 @@ function App() {
                 onClick={() => setShowForm(!showForm)}
                 className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                {showForm ? (
-                  <>
-                    <FiX /> Ocultar Formulario
-                  </>
-                ) : (
+                {showForm ? 'Ocultar Formulario' : (
                   <>
                     <FiPlus /> Nueva Mascota
                   </>
@@ -131,13 +154,13 @@ function App() {
                   onClick={() => setActiveView('agenda')}
                   className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-md ${activeView === 'agenda' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
                 >
-                  <FiCalendar size={16} />
+                  Agenda
                 </button>
                 <button
                   onClick={() => setActiveView('lista')}
                   className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-md ${activeView === 'lista' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
                 >
-                  <FiList size={16} />
+                  Lista
                 </button>
               </div>
             </div>
