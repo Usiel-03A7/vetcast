@@ -7,7 +7,7 @@ import CalendarView from './components/CalendarView';
 import PetList from './components/PetList';
 import EditPage from './components/EditPage';
 import ViewPage from './components/ViewPage';
-import { FiCalendar, FiList, FiPlus, FiSettings, FiEye } from 'react-icons/fi';
+import { FiCalendar, FiList, FiPlus, FiX } from 'react-icons/fi';
 
 function App() {
   const [pets, setPets] = useState([]);

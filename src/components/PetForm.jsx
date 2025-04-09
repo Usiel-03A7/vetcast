@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiSave, FiTrash2, FiX, FiEdit, FiCalendar } from 'react-icons/fi';
-//Falta agregar un total que reste y sepa si es deudor o no 
+import backgroundImage from '../assets/background.jpeg';
+//Falta agregar un total que reste y sepa si es deudor o no y almacenarlo para mostrarlo en los datos como una seccion de deudores y en esa seccion se pueda abonar
 const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePet }) => {
   const [formData, setFormData] = useState({
     ownerName: '',
@@ -46,18 +47,29 @@ const PetForm = ({ editingPet, onSave, onCancel, onDeleteAppointment, onDeletePe
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const deuda = parseFloat(formData.price) - parseFloat(formData.numberRed || 0);
     const petData = {
       ...formData,
       age: parseInt(formData.age) || 0,
       price: parseFloat(formData.price) || 0,
-      numberRed: parseFloat(formData.numberRed),
+      numberRed: parseFloat(formData.numberRed || 0),
+      deuda: deuda > 0 ? deuda : 0,
+      esDeudor: deuda > 0,
       lastUpdated: new Date().toISOString()
     };
     onSave(petData);
   };
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-blue-100 max-w-2xl mx-auto">
+    <div className="p-4 sm:p-6 rounded-lg shadow-md border border-blue-100 max-w-2xl mx-auto"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundBlendMode: 'overlay',
+        backgroundColor: 'rgba(255, 255, 255, 0.85)'
+      }}>
       <h2 className="text-lg sm:text-xl font-semibold text-blue-700 mb-4 text-center">
         {editingPet ? (
           <FiEdit className="inline-block text-blue-600 text-2xl mr-2" />

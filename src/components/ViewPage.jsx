@@ -1,6 +1,7 @@
 import { FiEye, FiPrinter } from 'react-icons/fi';
 
 const ViewPage = ({ pets }) => {
+  const deudores = pets.filter(p => p.esDeudor);
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-blue-100 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -42,6 +43,21 @@ const ViewPage = ({ pets }) => {
               </div>
             ))}
           </div>
+        </div>
+        <div className="p-4 bg-red-50 rounded-lg">
+          <h3 className="font-medium text-red-800 mb-2">Deudores</h3>
+          {deudores.length === 0 ? (
+            <p className="text-sm text-gray-600">No hay deudores.</p>
+          ) : (
+            <ul className="space-y-2">
+              {deudores.map(pet => (
+                <li key={pet.id} className="bg-white p-3 rounded-md shadow-sm border border-red-200">
+                  <p className="font-medium text-red-800">{pet.petName} - {pet.ownerName}</p>
+                  <p className="text-sm text-gray-600">Debe: ${pet.deuda}</p>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

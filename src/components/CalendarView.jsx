@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { FiEdit2, FiTrash2, FiArrowLeft } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiArrowLeft, FiX } from 'react-icons/fi';
 
 const CalendarView = ({ pets, onEdit, onDeleteAppointment }) => {
   const validPets = pets.filter(pet => pet.appointmentDate);
