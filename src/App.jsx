@@ -55,6 +55,28 @@ function App() {
     }
   }, [user]);
 
+  const handleUpdateDebt = async (petId, newDebt) => {
+    try {
+      await updateDoc(doc(db, 'pets', petId), {
+        deuda: newDebt,
+        esDeudor: newDebt > 0,
+        lastUpdated: new Date().toISOString()
+      });
+
+      setPets(pets.map(pet =>
+        pet.id === petId
+          ? {
+            ...pet,
+            deuda: newDebt,
+            esDeudor: newDebt > 0
+          }
+          : pet
+      ));
+    } catch (error) {
+      console.error("Error updating debt:", error);
+    }
+  };
+
   const handleSavePet = async (petData) => {
     try {
       if (editingPet) {
@@ -138,6 +160,7 @@ function App() {
           <ViewPage
             pets={pets}
             settings={pageSettings}
+            onUpdateDebt={handleUpdateDebt} 
           />
         ) : (
           <>

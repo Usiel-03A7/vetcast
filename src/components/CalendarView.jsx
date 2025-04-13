@@ -7,6 +7,9 @@ const CalendarView = ({ pets, onEdit, onDeleteAppointment }) => {
   const validPets = pets.filter(pet => pet.appointmentDate);
   const [selectedDate, setSelectedDate] = useState(null);
 
+  // Filtra mascotas que tienen fecha de cita (appointmentDate)
+  // Se crea un objeto (appointmentsByDate) que agrupa las citas por fecha
+
   const appointmentsByDate = validPets.reduce((acc, pet) => {
     const dateKey = pet.appointmentDate;
     if (!acc[dateKey]) acc[dateKey] = [];
