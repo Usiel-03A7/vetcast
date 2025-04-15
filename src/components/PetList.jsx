@@ -15,37 +15,48 @@ const PetList = ({ pets, setPets, setEditingPet }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-blue-100">
-      <h2 className="text-xl font-semibold text-blue-700 mb-4">📋 Registro de Mascotas</h2>
-      
+      <h2 className="text-xl font-semibold text-blue-700 mb-4">📋 Registro Completo de Mascotas</h2>
+
       {pets.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-blue-500">No hay mascotas registradas</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pets.map(pet => (
             <div key={pet.id} className="border border-blue-100 rounded-lg p-4 hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-medium text-blue-800">{pet.name}</h3>
+                <h3 className="text-lg font-medium text-blue-800">{pet.petName}</h3>
                 <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
                   {pet.age} años
                 </span>
               </div>
-              
-              <div className="space-y-1 text-sm text-gray-700 mb-3">
-                <p><span className="font-medium text-blue-600">Dueño:</span> {pet.owner}</p>
-                <p><span className="font-medium text-blue-600">Teléfono:</span> {pet.phoneNumber || 'N/A'}</p>
-                <p><span className="font-medium text-blue-600">Precio:</span> ${pet.price || '0'}</p>
-                <p><span className="font-medium text-blue-600">Última visita:</span> {pet.lastVisit?.toLocaleDateString() || 'N/A'}</p>
-                <p><span className="font-medium text-blue-600">Próxima visita:</span> {pet.NextVisit?.toLocaleDateString() || 'N/A'}</p>
-              </div>
-              
-              {pet.Information && (
-                <div className="mt-2 pt-2 border-t border-blue-50">
-                  <p className="text-sm text-gray-600"><span className="font-medium text-blue-600">Notas:</span> {pet.Information}</p>
+
+              <div className="space-y-2 text-sm text-gray-700 mb-3">
+                <div className="flex items-start">
+                  <span className="font-medium text-blue-600 min-w-[100px]">Dueño:</span>
+                  <span>{pet.ownerName}</span>
                 </div>
-              )}
-              
+                <div className="flex items-start">
+                  <span className="font-medium text-blue-600 min-w-[100px]">Teléfono:</span>
+                  <span>{pet.phone || 'N/A'}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-medium text-blue-600 min-w-[100px]">Precio:</span>
+                  <span>${pet.price || '0'}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="font-medium text-blue-600 min-w-[100px]">Ingreso:</span>
+                  <span>{new Date(pet.admissionDate).toLocaleDateString() || 'N/A'}</span>
+                </div>
+                {pet.appointmentDate && (
+                  <div className="flex items-start">
+                    <span className="font-medium text-blue-600 min-w-[100px]">Próxima cita:</span>
+                    <span>{new Date(pet.appointmentDate).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
+
               <div className="flex space-x-2 mt-4">
                 <button
                   onClick={() => setEditingPet(pet)}

@@ -121,15 +121,15 @@ const ViewPage = ({ pets, onUpdateDebt }) => {
                           type="number"
                           value={paymentAmount}
                           onChange={(e) => setPaymentAmount(e.target.value)}
-                          placeholder="Monto"
-                          className="border p-1 rounded w-24 text-sm"
+                          placeholder="$$$$"
+                          className="border px-2 text-center py-3 mr-5 rounded w-24 text-sm"
                           min="0"
                           max={pet.deuda}
                           step="0.01"
                         />
                         <button
                           onClick={() => handlePayment(pet.id, pet.deuda)}
-                          className="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600"
+                          className="bg-blue-500 text-white px-5 py-3 mr-5 rounded text-sm hover:bg-blue-600"
                         >
                           Aplicar
                         </button>
@@ -138,7 +138,7 @@ const ViewPage = ({ pets, onUpdateDebt }) => {
                             setEditingId(null);
                             setPaymentAmount('');
                           }}
-                          className="bg-gray-300 px-2 py-1 rounded text-sm hover:bg-gray-400"
+                          className="bg-gray-300 px-5 py-3 mr-5 rounded text-sm hover:bg-gray-400"
                         >
                           Cancelar
                         </button>
@@ -149,7 +149,7 @@ const ViewPage = ({ pets, onUpdateDebt }) => {
                           setEditingId(pet.id);
                           setPaymentAmount('');
                         }}
-                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                        className="bg-blue-500 text-white px-5 py-3 mr-5 rounded text-sm hover:bg-blue-600"
                       >
                         Registrar Pago
                       </button>
